@@ -2,7 +2,8 @@
 {
     public abstract record BezierCurve<T>
     {
-        public int Degree { get; set; }
+        public int ControlPointsResolution { get; set; }
+        public int Degree => ControlPointsResolution - 1;
         public IReadOnlyList<T> ControlPoints { get; set; }
 
         public bool IsValid
@@ -17,9 +18,9 @@
             }
         }
 
-        protected BezierCurve(int degree, IReadOnlyList<T> controlPoints)
+        protected BezierCurve(int controlPointsResolution, IReadOnlyList<T> controlPoints)
         {
-            Degree = degree;
+            ControlPointsResolution = controlPointsResolution;
             ControlPoints = controlPoints ?? throw new ArgumentNullException(nameof(controlPoints));
         }
 

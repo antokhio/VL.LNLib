@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Document xmlns:p="property" xmlns:r="reflection" Id="QjfiIsRiHPQMnKIlx908Xw" LanguageVersion="2025.7.1-0116-gaeae322323" Version="0.128">
+<Document xmlns:p="property" xmlns:r="reflection" Id="Fwtnf8RItQdQNkTFW2TopO" LanguageVersion="2025.7.1-0116-gaeae322323" Version="0.128">
   <NugetDependency Id="Mtd3KQKKqaFMei7htEI4ve" Location="VL.CoreLib" Version="2025.7.1-0116-gaeae322323" />
   <Patch Id="UaI4VxU0zPWNAhdHSmCopz">
     <Canvas Id="R8Z1ll8tKPLNyf8VvbfISj" DefaultCategory="Main" BordersChecked="false" CanvasType="FullCategory" />
@@ -22,12 +22,12 @@
               <CategoryReference Kind="Category" Name="Curve" />
               <Choice Kind="ProcessAppFlag" Name="RationalBezierCurve (2D)" />
             </p:NodeReference>
-            <Pin Id="JvmhBg9KSLQMVrtj0N8bSi" Name="Degree" Kind="InputPin" DefaultValue="15" />
+            <Pin Id="FtM1DqTMyfxPOncq7RbFIr" Name="Control Points Resolution" Kind="InputPin" />
             <Pin Id="AoKYPhXVVCKPj6ZPsjMoYx" Name="Control Points" Kind="InputPin" />
             <Pin Id="C70c6ntd39bMkpiXwh2ZxY" Name="Output" Kind="OutputPin" />
             <Pin Id="RsQ9fc3bcGHMgnf27as7vk" Name="Is Valid" Kind="OutputPin" />
           </Node>
-          <Node Bounds="535,204,503,166" Id="S5i0GEa7f11LWic4VFoafz">
+          <Node Bounds="535,204,391,166" Id="S5i0GEa7f11LWic4VFoafz">
             <p:NodeReference LastCategoryFullName="Primitive" LastDependency="Builtin">
               <Choice Kind="StatefulRegion" Name="Region (Stateful)" Fixed="true" />
               <CategoryReference Kind="Category" Name="Primitive" />
@@ -39,16 +39,7 @@
             <Patch Id="PRlgry5Z7EfLoJUQSb9g2u" ManuallySortedPins="true">
               <Patch Id="BnXRn6DSws5OYScWVPNRdv" Name="Create" ManuallySortedPins="true" />
               <Patch Id="PrAgKqDKIUpOEnw8SHGbV5" Name="Then" ManuallySortedPins="true" />
-              <Node Bounds="547,290,33,19" Id="RivWTrjIDQFLhuy2BxAFJQ">
-                <p:NodeReference LastCategoryFullName="Primitive.Integer32" LastDependency="VL.CoreLib.vl">
-                  <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
-                  <FullNameCategoryReference ID="Primitive.Integer32" />
-                  <Choice Kind="OperationCallFlag" Name="Dec" />
-                </p:NodeReference>
-                <Pin Id="QONy7t8iRRZNTIBJZGNi9N" Name="Input" Kind="StateInputPin" />
-                <Pin Id="OA6QqPSBbEkO9v56W5ZWma" Name="Output" Kind="StateOutputPin" />
-              </Node>
-              <Node Bounds="547,240,44,26" Id="UUaBBK5Aij6PnyCyz46rd7">
+              <Node Bounds="547,270,44,26" Id="UUaBBK5Aij6PnyCyz46rd7">
                 <p:NodeReference LastCategoryFullName="Collections.Spread" LastDependency="VL.CoreLib.vl">
                   <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
                   <FullNameCategoryReference ID="Collections.Spread" />
@@ -302,7 +293,7 @@
               </p:TypeArguments>
             </p:TypeAnnotation>
             <p:Value>
-              <Item>-0.5, 0, 1</Item>
+              <Item>-0.53, 0, 1</Item>
               <Item>-0.125, -0.67, 2</Item>
               <Item>0.125, 0.33, 1</Item>
               <Item>0.5, 0, 1</Item>
@@ -315,11 +306,9 @@
           <Fragment Id="BglZA8b8ocRO8TWVzjsB6U" Patch="GAfKVgBNtXdNWFsGdjBeOb" Enabled="true" />
           <Fragment Id="EkgxDXSaKSYQXJhLJXk8d4" Patch="Gm42y5qmgUiQRENgrQoIOq" Enabled="true" />
         </ProcessDefinition>
-        <Link Id="KmdERG9v3jbNubuIJbu72E" Ids="OA6QqPSBbEkO9v56W5ZWma,US0pSTwe3j8MWsouqDcVJu" />
         <Link Id="SSDKQ7AYpsUMgDlerHufXC" Ids="CXOcnM7VwZwPaLgsMQmsoi,GOrSzRRCkyBMLG0ad7vRY9" />
         <Link Id="Ux0YDYS3HlKN520Jn5U3ju" Ids="TpRpcR7ce8cPQyWDf8mF7Z,UHVjWJVGjHENgBUFqQplM2" />
         <Link Id="HTVbLnidB4cP3ei8zBvS6g" Ids="OCoL43XFLJJPzzbGStTneo,PqHjJ4YXR72NMZj1EpPvYW" />
-        <Link Id="KB6YS5gERDOMlRSjwpuccF" Ids="US0pSTwe3j8MWsouqDcVJu,JvmhBg9KSLQMVrtj0N8bSi" />
         <Link Id="UBYRmqNpqiWLJb6Nwbz9Aq" Ids="VymizoA4ZDwMzJ7LZEGRU5,JrTV12tgRRRLUgHcEd7ImF" />
         <Link Id="OBdnPuflfGKOyOmDqAsQzW" Ids="Hb2ZNXYBf7vNm8du3t5lK3,VTa0RbEMGi6PNVikLKrcFc" />
         <Link Id="CaevJnWmA2pO8couDH0m9h" Ids="Lh83DLCIxwgO7UkWzh22Ow,BJbR3GZyzMOLnH089SJiKL" />
@@ -330,7 +319,6 @@
         <Link Id="SfnAAxyesnXQLtZAnFkJXR" Ids="GOrSzRRCkyBMLG0ad7vRY9,BfjHkS62yqjPNx2PRneRAX" />
         <Link Id="Kk7aDlC2gRgMF923ABrzgC" Ids="M6gUyRyUJ2xQYWmgSQgWml,BMDchAnRK5kPtCzgmCCX5D" />
         <Link Id="AfSWtR7i2TaPB0cdwEgfJ7" Ids="BMDchAnRK5kPtCzgmCCX5D,AXbszDF2ye3MLkT9XaVXG1" />
-        <Link Id="BnWINR1gPwBLdTo53fF3vF" Ids="JzFxbcM5YqILyijuK0OxQl,QONy7t8iRRZNTIBJZGNi9N" />
         <Link Id="UYQQNW12DAYLzhCw2oQnoE" Ids="C8fzviYPIIuMzqZKaewBr1,AXJxJfcgSJ5MWpuuFXGm7o" IsFeedback="true" />
         <Link Id="ORDSpVjZ07eQVXLdQayEM9" Ids="AHa2TdIJi7hOZnnHBCvuxl,AXJxJfcgSJ5MWpuuFXGm7o" />
         <Link Id="QSkutoif213Ncb1IwaIhUP" Ids="AXJxJfcgSJ5MWpuuFXGm7o,Fas1soVeTVHP5Z8fY9Oh3L" />
@@ -342,6 +330,8 @@
         <Link Id="B5Kbg9CyryJNDQ8xG5MS74" Ids="Tlv6YdEKKHgN2HyXzUFC3m,LMAHzmdOfpFOH1ZBs2CUa7" />
         <Link Id="OsPmQKXPb6dM7pjuZO6iuY" Ids="M6gUyRyUJ2xQYWmgSQgWml,MjNltKXFLzAOOwwAKZjCYf" />
         <Link Id="NujAJHWZSdFLd0VA5YOH84" Ids="MjNltKXFLzAOOwwAKZjCYf,AoKYPhXVVCKPj6ZPsjMoYx" />
+        <Link Id="AEvPZt0M2amMpnvRKwMsCh" Ids="US0pSTwe3j8MWsouqDcVJu,FtM1DqTMyfxPOncq7RbFIr" />
+        <Link Id="I7S6ZpH3qsbOqUlE2cgKd5" Ids="JzFxbcM5YqILyijuK0OxQl,US0pSTwe3j8MWsouqDcVJu" />
       </Patch>
     </Node>
   </Patch>

@@ -6,8 +6,8 @@ namespace VL.LNLib.Curve
 {
     public record BezierCurve3D : BezierCurve<Vector3>
     {
-        public BezierCurve3D(int degree, IReadOnlyList<Vector3> controlPoints)
-            : base(degree, controlPoints) { }
+        public BezierCurve3D(int controlPointsResolution, IReadOnlyList<Vector3> controlPoints)
+            : base(controlPointsResolution, controlPoints) { }
 
         public override Vector3 GetPointOnCurve(float t)
         {

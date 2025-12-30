@@ -7,6 +7,8 @@ namespace VL.LNLib.Curve
     public abstract class BezierCurveNode<TCurve, TPoint>
         where TCurve : BezierCurve<TPoint>
     {
+        protected const int DefaultControlPointsResolution = 1;
+
         private TCurve _output;
         public TCurve Output => _output;
         public bool IsValid => _output.IsValid;
@@ -16,11 +18,13 @@ namespace VL.LNLib.Curve
             _output = curve;
         }
 
-        public void SetDegree(int degree)
+        public void SetControlPointsResolution(
+            int controlPointsResolution = DefaultControlPointsResolution
+        )
         {
-            if (_output.Degree != degree)
+            if (_output.ControlPointsResolution != controlPointsResolution)
             {
-                _output = _output with { Degree = degree };
+                _output = _output with { ControlPointsResolution = controlPointsResolution };
             }
         }
 
@@ -41,37 +45,33 @@ namespace VL.LNLib.Curve
     [ProcessNode(Name = "BezierCurve (2D)")]
     public class BezierCurve2DNode : BezierCurveNode<BezierCurve2D, Vector2>
     {
-        const int DefaultDegree = 1;
         static readonly IReadOnlyList<Vector2> DefaultControlPoints = [new(-1, 0), new(1, 0)];
 
         public BezierCurve2DNode()
-            : base(new(DefaultDegree, DefaultControlPoints)) { }
+            : base(new(DefaultControlPointsResolution, DefaultControlPoints)) { }
     }
 
     [ProcessNode(Name = "BezierCurve (3D)")]
     public class BezierCurve3DNode : BezierCurveNode<BezierCurve3D, Vector3>
     {
-        const int DefaultDegree = 1;
         static readonly IReadOnlyList<Vector3> DefaultControlPoints = [new(-1, 0, 0), new(1, 0, 0)];
 
         public BezierCurve3DNode()
-            : base(new(DefaultDegree, DefaultControlPoints)) { }
+            : base(new(DefaultControlPointsResolution, DefaultControlPoints)) { }
     }
 
     [ProcessNode(Name = "RationalBezierCurve (2D)")]
     public class RationalBezierCurve2DNode : BezierCurveNode<RationalBezierCurve2D, Vector3>
     {
-        const int DefaultDegree = 1;
         static readonly IReadOnlyList<Vector3> DefaultControlPoints = [new(-1, 0, 1), new(1, 0, 1)];
 
         public RationalBezierCurve2DNode()
-            : base(new(DefaultDegree, DefaultControlPoints)) { }
+            : base(new(DefaultControlPointsResolution, DefaultControlPoints)) { }
     }
 
     [ProcessNode(Name = "RationalBezierCurve (3D)")]
     public class RationalBezierCurve3DNode : BezierCurveNode<RationalBezierCurve3D, Vector4>
     {
-        const int DefaultDegree = 1;
         static readonly IReadOnlyList<Vector4> DefaultControlPoints =
         [
             new(-1, 0, 0, 1),
@@ -79,6 +79,6 @@ namespace VL.LNLib.Curve
         ];
 
         public RationalBezierCurve3DNode()
-            : base(new(DefaultDegree, DefaultControlPoints)) { }
+            : base(new(DefaultControlPointsResolution, DefaultControlPoints)) { }
     }
 }

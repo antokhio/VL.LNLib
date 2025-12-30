@@ -1,33 +1,36 @@
 ﻿using System.Buffers;
 using LNLibSharp;
 using Stride.Core.Mathematics;
+using VL.LNLib.Surface.VL.LNLib.Surface;
 
-namespace VL.LNLib.Curve
+namespace VL.LNLib.Surface
 {
-    public record RationalBezierCurve2D : BezierCurve<Vector3>
+    public record RationalBezierSurface2D : BezierSurface<Vector3>
     {
-        public RationalBezierCurve2D(
-            int controlPointsResolution,
+        public RationalBezierSurface2D(
+            int controlPointsResolutionX,
+            int controlPointsResolutionY,
             IReadOnlyList<Vector3> controlPoints
         )
-            : base(controlPointsResolution, controlPoints) { }
+            : base(controlPointsResolutionX, controlPointsResolutionY, controlPoints) { }
 
-        public override Vector3 GetPointOnCurve(float t)
+        public override Vector3 GetPointOnSurface(Vector2 uv)
         {
-            // Input ControlPoints are: X, Y, Weight
-
             int count = ControlPoints.Count;
+            int rows = ControlPointsResolutionX;
+            int cols = ControlPointsResolutionY;
+
             var pool = ArrayPool<XYZW>.Shared;
             XYZW[] nativePoints = pool.Rent(count);
+
             try
             {
                 for (int i = 0; i < count; i++)
                 {
                     var v = ControlPoints[i];
-                    double w = v.Z;
+                    double w = v.Z; // Z component is Weight in 2D Rational
 
-                    // Convert Euclidean Control Point to Homogeneous Control Point
-                    // P_hom = (x*w, y*w, z*w, w)
+                    // Convert to Homogeneous: (x*w, y*w, 0, w)
                     nativePoints[i] = new XYZW
                     {
                         wx = v.X * w,
@@ -37,16 +40,18 @@ namespace VL.LNLib.Curve
                     };
                 }
 
-                var result = LNLibBezierCurve.GetRationalPointOnCurveByBernstein(
-                    Degree,
+                var nativeUV = new UV { u = uv.X, v = uv.Y };
+
+                var result = LNLibBezierSurface.GetRationalPointOnSurfaceByDeCasteljau(
+                    DegreeU,
+                    DegreeV,
                     nativePoints,
-                    count,
-                    t
+                    rows,
+                    cols,
+                    nativeUV
                 );
 
-                // IMPORTANT: Convert Homogeneous Result back to Euclidean
-                // P_euc = (wx/w, wy/w)
-                // We return X, Y as position and Z as the interpolated weight
+                // Convert back to Euclidean: (wx/w, wy/w, w)
                 if (System.Math.Abs(result.w) > 1e-9)
                 {
                     double invW = 1.0 / result.w;
@@ -57,7 +62,6 @@ namespace VL.LNLib.Curve
                     );
                 }
 
-                // Fallback for zero weight (shouldn't happen with valid curves)
                 return new Vector3((float)result.wx, (float)result.wy, (float)result.w);
             }
             finally
@@ -66,10 +70,9 @@ namespace VL.LNLib.Curve
             }
         }
 
-        // Helper to get pure 2D point
-        public Vector2 GetPointOnCurve2D(float t)
+        public Vector2 GetPointOnSurface2D(Vector2 uv)
         {
-            var v3 = GetPointOnCurve(t);
+            var v3 = GetPointOnSurface(uv);
             return new Vector2(v3.X, v3.Y);
         }
     }
