@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="LICENSE" />
+    <File Path="NOTICE" />
+    <File Path="README.MD" />
+  </Folder>
+  <Project Path="VL.LNLib/src/VL.LNLib.csproj" />
+</Solution>

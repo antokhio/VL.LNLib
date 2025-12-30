@@ -1,0 +1,3 @@
+[submodule "lnlib"]
+	path = lnlib
+	url = git@github.com:antokhio/LNLib.git

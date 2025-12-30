@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Document xmlns:p="property" xmlns:r="reflection" Id="FnrhA5rkOVDL7rCrAaAUbK" LanguageVersion="2025.7.1-0116-gaeae322323" Version="0.128">
+  <NugetDependency Id="OrGE3lSOp5FOprav4IqbfJ" Location="VL.CoreLib" Version="2025.7.1-0116-gaeae322323" />
+  <Patch Id="QMwVrMZmcoBNqdN60mTZsC">
+    <Canvas Id="K3vZdRweWVrPOYkZudduGd" DefaultCategory="LNLib" CanvasType="FullCategory">
+      <!--
+
+    ************************ LN_NurbsCurve ************************
+
+-->
+      <Node Name="LN_NurbsCurve" Bounds="444,389" Id="PH0PcQiCCfyNfgfWvYz8m3">
+        <p:NodeReference>
+          <Choice Kind="ForwardDefinition" Name="Forward" />
+          <CategoryReference Kind="Category" Name="Primitive" />
+        </p:NodeReference>
+        <p:TypeAnnotation LastCategoryFullName="LNLibSharp" LastDependency="LNLibSharp.dll">
+          <Choice Kind="TypeFlag" Name="LN_NurbsCurve" />
+          <FullNameCategoryReference ID="LNLibSharp" />
+          <AssemblyReference ID="LNLibSharp.dll" />
+        </p:TypeAnnotation>
+        <Patch Id="PKN89Snbe6rLsaOa6Uh9en">
+          <Canvas Id="CLerAjVjBH7LXxox5YSr5t" BordersChecked="false" CanvasType="Group" />
+          <ProcessDefinition Id="AUUfu2lUoC0L6XEb6VtWB9" IsHidden="true" />
+        </Patch>
+      </Node>
+      <!--
+
+    ************************ XYZ ************************
+
+-->
+      <Node Name="XYZ" Bounds="411,578" Id="Mnc4DXURGrvNOdsjUXLkqs">
+        <p:NodeReference>
+          <Choice Kind="ForwardDefinition" Name="Forward" />
+          <CategoryReference Kind="Category" Name="Primitive" />
+        </p:NodeReference>
+        <p:TypeAnnotation LastCategoryFullName="LNLibSharp" LastDependency="LNLibSharp.dll">
+          <Choice Kind="TypeFlag" Name="XYZ" />
+          <FullNameCategoryReference ID="LNLibSharp" />
+          <AssemblyReference ID="LNLibSharp.dll" />
+        </p:TypeAnnotation>
+        <Patch Id="Llu4iJdnKqBQO8d5hrYVlD">
+          <Canvas Id="I7MkIKAH0D5P74rQqOr8GG" CanvasType="Group" />
+          <ProcessDefinition Id="MN1XEnRZHNfOYqMfkwzlzO" IsHidden="true" />
+        </Patch>
+      </Node>
+      <!--
+
+    ************************ LNLibBezierCurve ************************
+
+-->
+      <Node Name="LNLibBezierCurve" Bounds="541,553" Id="GkHooCELt1aPCR6XRquf61">
+        <p:NodeReference>
+          <Choice Kind="ForwardDefinition" Name="Forward" />
+          <CategoryReference Kind="Category" Name="Primitive" />
+        </p:NodeReference>
+        <p:TypeAnnotation LastCategoryFullName="LNLibSharp" LastDependency="LNLibSharp.dll">
+          <Choice Kind="TypeFlag" Name="LNLibBezierCurve" />
+          <FullNameCategoryReference ID="LNLibSharp" />
+          <AssemblyReference ID="LNLibSharp.dll" />
+        </p:TypeAnnotation>
+        <Patch Id="RJK1K6zV6hZNpRmytOq6Ao">
+          <Canvas Id="Fl63DJocAKfOox0yanAra7" BordersChecked="false" CanvasType="Group" />
+          <ProcessDefinition Id="OKy19EcMbRjN0txJIjidzN" IsHidden="true" />
+        </Patch>
+      </Node>
+    </Canvas>
+    <!--
+
+    ************************ Application ************************
+
+-->
+    <Node Name="Application" Bounds="100,100" Id="ECn2idb2DqyOLieMx3VsLZ">
+      <p:NodeReference>
+        <Choice Kind="ContainerDefinition" Name="Process" />
+        <CategoryReference Kind="Category" Name="Primitive" />
+      </p:NodeReference>
+      <Patch Id="LtOhEAHFz0fPn4GHYX6S1d">
+        <Canvas Id="L7rTjvSGlzCNYa4KBrbNNS" CanvasType="Group" />
+        <Patch Id="Bg6WacNYvKRMv0ueq3g5DH" Name="Create" />
+        <Patch Id="CzbtUZIg4zuMlHezf8t8zJ" Name="Update" />
+        <ProcessDefinition Id="U5Ouwuza7PSPlh9bwQ0UbS">
+          <Fragment Id="P94elDSSpI8NrebQLCEeop" Patch="Bg6WacNYvKRMv0ueq3g5DH" Enabled="true" />
+          <Fragment Id="VMgFH9btFRmPwMokDXyzGZ" Patch="CzbtUZIg4zuMlHezf8t8zJ" Enabled="true" />
+        </ProcessDefinition>
+      </Patch>
+    </Node>
+  </Patch>
+  <PlatformDependency Id="ILvVchKiAeONuokn9exF5j" Location="./lib/Debug/net8.0/VL.LNLib.dll" IsForward="true" />
+  <PlatformDependency Id="Ad2fCIDu8fTMehGvEaoVqv" Location="./runtimes/win-64/native/LNLibSharp.dll" />
+</Document>
