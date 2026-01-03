@@ -29,6 +29,11 @@ namespace VL.LNLib.Curve
         /// </summary>
         public IReadOnlyList<double> Knots { get; init; }
 
+        /// <summary>
+        /// Count of knots.
+        /// </summary>
+        public int KnotCount => Knots.Count;
+
         public bool IsValid
         {
             get
@@ -57,5 +62,7 @@ namespace VL.LNLib.Curve
         }
 
         public abstract XYZW[] ToNativeControlPoints();
+
+        public abstract T GetPointOnCurve(float t);
     }
 }

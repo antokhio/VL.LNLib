@@ -1,6 +1,7 @@
 ﻿using LNLibSharp;
 using Stride.Core.Mathematics;
 using VL.LNLib.Extensions;
+using VL.LNLib.Helpers;
 
 namespace VL.LNLib.Curve
 {
@@ -26,6 +27,20 @@ namespace VL.LNLib.Curve
                 native[i] = ControlPoints[i].ToHomogeneousXYZW();
             }
             return native;
+        }
+
+        public override Vector3 GetPointOnCurve(float t)
+        {
+            Vector3 result = default;
+            NurbsCurveInterop.WithNativeCurve(
+                this,
+                nativeCurve =>
+                {
+                    XYZ point = LNLibNurbsCurve.GetPointOnCurve(nativeCurve, t);
+                    result = new Vector3((float)point.x, (float)point.y, (float)point.z);
+                }
+            );
+            return result;
         }
     }
 }

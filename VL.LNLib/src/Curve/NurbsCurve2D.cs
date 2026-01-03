@@ -1,5 +1,6 @@
 ﻿using LNLibSharp;
 using Stride.Core.Mathematics;
+using VL.LNLib.Helpers;
 
 namespace VL.LNLib.Curve
 {
@@ -33,6 +34,22 @@ namespace VL.LNLib.Curve
                 };
             }
             return native;
+        }
+
+        public override Vector2 GetPointOnCurve(float t)
+        {
+            Vector2 result = default;
+            NurbsCurveInterop.WithNativeCurve(
+                this,
+                nativeCurve =>
+                {
+                    LNLibNurbsCurve.Reparametrize(nativeCurve, 0.0, 1.0, out var normalizedCurve);
+
+                    XYZ point = LNLibNurbsCurve.GetPointOnCurve(normalizedCurve, t);
+                    result = new Vector2((float)point.x, (float)point.y);
+                }
+            );
+            return result;
         }
     }
 }
