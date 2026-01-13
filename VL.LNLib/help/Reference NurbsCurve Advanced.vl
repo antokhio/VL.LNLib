@@ -350,17 +350,6 @@
             <ControlPoint Id="C90wHonVYu8Mopv9skTfrQ" Bounds="649,551" Alignment="Top" />
             <ControlPoint Id="ExTQekjPbIsMnhGhWqT2Rn" Bounds="649,675" Alignment="Bottom" />
           </Node>
-          <Node Bounds="837,551,70,19" Id="Ja7k2LMP3AGOLP9tV0w7g4">
-            <p:NodeReference LastCategoryFullName="LNLib.Curve" LastDependency="VL.LNLib.vl">
-              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
-              <Choice Kind="ProcessAppFlag" Name="NurbsCurve (2D)" />
-            </p:NodeReference>
-            <Pin Id="NAz7tGjnosKK9wCiP8AKvm" Name="Degree" Kind="InputPin" />
-            <Pin Id="Ss2ufmBJyboOWb3p3wDmMo" Name="Control Points" Kind="InputPin" />
-            <Pin Id="Lakov8RuoseLAIwVtaTo3P" Name="Knots" Kind="InputPin" IsHidden="true" />
-            <Pin Id="NQHYSoBfAjyLz3TGr8JwJr" Name="Update" Kind="ApplyPin" />
-            <Pin Id="A8DLwvvZ6KkN7ju6hOc0jD" Name="Output" Kind="OutputPin" />
-          </Node>
         </Canvas>
         <Patch Id="GAfKVgBNtXdNWFsGdjBeOb" Name="Create" />
         <Patch Id="Gm42y5qmgUiQRENgrQoIOq" Name="Update" />
