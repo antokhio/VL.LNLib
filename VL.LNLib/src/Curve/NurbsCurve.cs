@@ -15,7 +15,12 @@ namespace VL.LNLib.Curve
         public int Degree { get; set; }
 
         /// <summary>
-        /// Control points converted to Vector2.
+        /// The approximate length of the curve. Calculated upon creation.
+        /// </summary>
+        public float Length { get; private set; }
+
+        /// <summary>
+        /// Control points converted to Vector2 or Vector3.
         /// Note: This conversion assumes the native control points are weighted (XYZW) and performs the division by W.
         /// </summary>
         public IReadOnlyList<T> ControlPoints { get; set; }
@@ -38,6 +43,11 @@ namespace VL.LNLib.Curve
                 nativeCurve.control_points,
                 nativeCurve.control_point_count
             );
+            Length = (float)
+                LNLibNurbsCurve.ApproximateLength(
+                    NativeCurve,
+                    IntegratorType.INTEGRATOR_GAUSS_LEGENDRE
+                );
         }
 
         /// <summary>
@@ -57,6 +67,11 @@ namespace VL.LNLib.Curve
             ControlPoints = controlPoints;
             NativeCurve = NurbsCurveHelper.CreateNative(controlPoints, degree, out var knots);
             Knots = knots;
+            Length = (float)
+                LNLibNurbsCurve.ApproximateLength(
+                    NativeCurve,
+                    IntegratorType.INTEGRATOR_GAUSS_LEGENDRE
+                );
         }
 
         /// <summary>
@@ -78,6 +93,11 @@ namespace VL.LNLib.Curve
             ControlPoints = controlPoints;
             Knots = knots;
             NativeCurve = NurbsCurveHelper.CreateNative(controlPoints, degree, knots);
+            Length = (float)
+                LNLibNurbsCurve.ApproximateLength(
+                    NativeCurve,
+                    IntegratorType.INTEGRATOR_GAUSS_LEGENDRE
+                );
         }
 
         /// <summary>
@@ -92,12 +112,59 @@ namespace VL.LNLib.Curve
         }
 
         /// <summary>
+        /// Evaluates the curve at a normalized position along its length (0 to 1).
+        /// This method compensates for non-uniform parameterization.
+        /// </summary>
+        /// <param name="factor">The normalized length factor (0.0 to 1.0).</param>
+        /// <returns>The point on the curve.</returns>
+        public T GetPointAt(float factor)
+        {
+            // Calculate target length from factor
+            float targetLength = factor * Length;
+
+            // Get parameter t corresponding to that length
+            var t = GetParamByLength(targetLength);
+
+            // Get point at parameter t
+            var result = LNLibNurbsCurve.GetPointOnCurve(NativeCurve, t);
+            return NurbsCurveHelper.FromXYZ<T>(result);
+        }
+
+        /// <summary>
+        /// Calculates the parameter value on the curve that corresponds to the specified arc length from the start of
+        /// the curve.
+        /// </summary>
+        /// <param name="length">The arc length, in curve units, from the start of the curve for which to find the corresponding parameter
+        /// value. Must be non-negative and less than or equal to the total length of the curve.</param>
+        /// <returns>The parameter value on the curve that is located at the specified arc length from the start of the curve.</returns>
+        public float GetParamByLength(float length)
+        {
+            return (float)
+                LNLibNurbsCurve.GetParamByLength(
+                    NativeCurve,
+                    length,
+                    IntegratorType.INTEGRATOR_GAUSS_LEGENDRE
+                );
+        }
+
+        /// <summary>
+        /// Manually calculates the approximate length of the curve.
+        /// Usually not needed as Length is cached on creation.
+        /// </summary>
+        public float ApproximateLength(
+            IntegratorType integrator = IntegratorType.INTEGRATOR_GAUSS_LEGENDRE
+        )
+        {
+            return (float)LNLibNurbsCurve.ApproximateLength(NativeCurve, integrator);
+        }
+
+        /// <summary>
         /// Reparametrize the curve within the given domain.
         /// </summary>
         /// <param name="min">Minimum value of the new domain.</param>
         /// <param name="max">Maximum value of the new domain.</param>
         /// <returns>A new NurbsCurve instance representing the reparametrized curve.</returns>
-        public NurbsCurve<T> Reparametrize(double min, double max)
+        public NurbsCurve<T> Reparametrize(float min, float max)
         {
             LNLibNurbsCurve.Reparametrize(NativeCurve, min, max, out var result);
             return new NurbsCurve<T>(result);

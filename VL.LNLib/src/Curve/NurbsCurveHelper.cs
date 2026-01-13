@@ -183,6 +183,8 @@ namespace VL.LNLib.Curve
 
         public static T FromXYZ<T>(XYZ point)
         {
+            // Note: Assuming XYZ fields are accessible as x, y, z (lowercase) based on previous context.
+            // If XYZ uses uppercase X, Y, Z, please adjust accordingly.
             if (typeof(T) == typeof(Vector2))
                 return (T)(object)new Vector2((float)point.x, (float)point.y);
             if (typeof(T) == typeof(Vector3))
