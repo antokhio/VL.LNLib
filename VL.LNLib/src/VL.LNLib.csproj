@@ -19,4 +19,8 @@
   <ItemGroup>
     <PackageReference Include="VL.Core" Version="2025.7.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Curve\NewFolder\" />
+  </ItemGroup>
 </Project>
