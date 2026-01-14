@@ -107,6 +107,7 @@ namespace VL.LNLib.Curve
         /// <returns>The point on the curve.</returns>
         public T GetPointOnCurve(float t)
         {
+            ThrowIfNotAssigned();
             var result = LNLibNurbsCurve.GetPointOnCurve(NativeCurve, t);
             return NurbsCurveHelper.FromXYZ<T>(result);
         }
@@ -119,6 +120,7 @@ namespace VL.LNLib.Curve
         /// <returns>The point on the curve.</returns>
         public T GetPointAt(float factor)
         {
+            ThrowIfNotAssigned();
             // Calculate target length from factor
             float targetLength = factor * Length;
 
@@ -131,6 +133,35 @@ namespace VL.LNLib.Curve
         }
 
         /// <summary>
+        /// Calculates the normal vector on the curve at parameter t.
+        /// </summary>
+        /// <param name="t">The parameter value.</param>
+        /// <returns>The normal vector.</returns>
+        public T GetNormal(float t)
+        {
+            ThrowIfNotAssigned();
+            var result = LNLibNurbsCurve.Normal(NativeCurve, CurveNormal.CURVE_NORMAL_NORMAL, t);
+            return NurbsCurveHelper.FromXYZ<T>(result);
+        }
+
+        /// <summary>
+        /// Calculates the normal vector on the curve at a normalized position along its length (0 to 1).
+        /// </summary>
+        /// <param name="factor">The normalized length factor (0.0 to 1.0).</param>a4
+        /// <returns>The normal vector.</returns>
+        public T GetNormalAt(float factor)
+        {
+            ThrowIfNotAssigned();
+            // Calculate target length from factor
+            float targetLength = factor * Length;
+
+            // Get parameter t corresponding to that length
+            var t = GetParamByLength(targetLength);
+
+            return GetNormal(t);
+        }
+
+        /// <summary>
         /// Calculates the parameter value on the curve that corresponds to the specified arc length from the start of
         /// the curve.
         /// </summary>
@@ -139,6 +170,8 @@ namespace VL.LNLib.Curve
         /// <returns>The parameter value on the curve that is located at the specified arc length from the start of the curve.</returns>
         public float GetParamByLength(float length)
         {
+            ThrowIfNotAssigned();
+
             return (float)
                 LNLibNurbsCurve.GetParamByLength(
                     NativeCurve,
@@ -155,6 +188,7 @@ namespace VL.LNLib.Curve
             IntegratorType integrator = IntegratorType.INTEGRATOR_GAUSS_LEGENDRE
         )
         {
+            ThrowIfNotAssigned();
             return (float)LNLibNurbsCurve.ApproximateLength(NativeCurve, integrator);
         }
 
@@ -166,6 +200,7 @@ namespace VL.LNLib.Curve
         /// <returns>A new NurbsCurve instance representing the reparametrized curve.</returns>
         public NurbsCurve<T> Reparametrize(float min, float max)
         {
+            ThrowIfNotAssigned();
             LNLibNurbsCurve.Reparametrize(NativeCurve, min, max, out var result);
             return new NurbsCurve<T>(result);
         }
@@ -183,6 +218,20 @@ namespace VL.LNLib.Curve
             var native = NativeCurve;
             NurbsCurveHelper.FreeNative(ref native);
             NativeCurve = native;
+        }
+
+        /// <summary>
+        /// Checks if the native curve is initialized.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown if native curve pointers are zero.</exception>
+        private void ThrowIfNotAssigned()
+        {
+            if (NativeCurve.control_points == IntPtr.Zero || NativeCurve.knot_vector == IntPtr.Zero)
+            {
+                throw new InvalidOperationException(
+                    "NurbsCurve is not initialized. Ensure it has been created with valid control points and degree."
+                );
+            }
         }
 
         /// <summary>
