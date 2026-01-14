@@ -1,4 +1,6 @@
-﻿using LNLibSharp;
+﻿using System.Runtime.CompilerServices;
+using LNLibSharp;
+using Stride.Core.Mathematics;
 
 namespace VL.LNLib.Curve
 {
@@ -136,20 +138,59 @@ namespace VL.LNLib.Curve
         /// Calculates the normal vector on the curve at parameter t.
         /// </summary>
         /// <param name="t">The parameter value.</param>
+        /// <param name="upVector">Optional up-vector for stability. Defaults to Y-Up.</param>
         /// <returns>The normal vector.</returns>
-        public T GetNormal(float t)
+        public T GetNormal(float t, T? upVector = default)
         {
             ThrowIfNotAssigned();
-            var result = LNLibNurbsCurve.Normal(NativeCurve, CurveNormal.CURVE_NORMAL_NORMAL, t);
-            return NurbsCurveHelper.FromXYZ<T>(result);
+
+            // Get normalized tangent
+            var tangentT = GetTangent(t);
+
+            if (typeof(T) == typeof(Vector3))
+            {
+                var tangent = Unsafe.As<T, Vector3>(ref tangentT);
+                var up = upVector == null ? Vector3.UnitY : Unsafe.As<T, Vector3>(ref upVector);
+
+                var binormal = Vector3.Cross(tangent, up);
+
+                // If Tangent is parallel to Up, pick a fallback
+                if (binormal.LengthSquared() < 1e-5f)
+                {
+                    // Fallback: try UnitX, if still parallel, try UnitZ
+                    binormal = Vector3.Cross(tangent, Vector3.UnitX);
+                    if (binormal.LengthSquared() < 1e-5f)
+                        binormal = Vector3.Cross(tangent, Vector3.UnitZ);
+                }
+
+                binormal = Vector3.Normalize(binormal);
+
+                // Normal = Cross(Binormal, Tangent)
+                var normal = Vector3.Cross(binormal, tangent);
+
+                return Unsafe.As<Vector3, T>(ref normal);
+            }
+            else if (typeof(T) == typeof(Vector2))
+            {
+                var tangent = Unsafe.As<T, Vector2>(ref tangentT);
+                if (tangent.LengthSquared() > 1e-6f)
+                    tangent = Vector2.Normalize(tangent);
+
+                // 2D Normal: (-y, x)
+                Vector2 normal = new Vector2(-tangent.Y, tangent.X);
+                return Unsafe.As<Vector2, T>(ref normal);
+            }
+
+            throw new NotSupportedException($"Type {typeof(T)} not supported.");
         }
 
         /// <summary>
         /// Calculates the normal vector on the curve at a normalized position along its length (0 to 1).
         /// </summary>
-        /// <param name="factor">The normalized length factor (0.0 to 1.0).</param>a4
+        /// <param name="factor">The normalized length factor (0.0 to 1.0).</param>
+        /// <param name="upVector">Optional up-vector for 3D stability.</param>
         /// <returns>The normal vector.</returns>
-        public T GetNormalAt(float factor)
+        public T GetNormalAt(float factor, T upVector)
         {
             ThrowIfNotAssigned();
             // Calculate target length from factor
@@ -158,7 +199,27 @@ namespace VL.LNLib.Curve
             // Get parameter t corresponding to that length
             var t = GetParamByLength(targetLength);
 
-            return GetNormal(t);
+            return GetNormal(t, upVector);
+        }
+
+        /// <summary>
+        /// Calculates the tangent vector on the curve at parameter t.
+        /// </summary>
+        /// <param name="t">The parameter value.</param>
+        /// <returns>The normalized tangent vector.</returns>
+        public T GetTangent(float t)
+        {
+            ThrowIfNotAssigned();
+
+            // Calculate derivatives (Order 1 gives Point [0] and 1st Derivative [1])
+            var derivatives = new XYZ[2];
+            LNLibNurbsCurve.ComputeRationalCurveDerivatives(NativeCurve, 1, t, derivatives);
+
+            // derivatives[1] is the tangent vector (unnormalized)
+            var vec = NurbsCurveHelper.FromXYZ<T>(derivatives[1]);
+            var normalizedVec = NurbsCurveHelper.Normalize(vec);
+
+            return normalizedVec;
         }
 
         /// <summary>

@@ -137,7 +137,7 @@
             <Pin Id="VgTiJkrbplYQWXScPgtIIy" Name="Value" Kind="InputPin" DefaultValue="1, 0, 0, 1" />
             <Pin Id="DfBbEZJ62y0Lb5ztazbvsf" Name="Output" Kind="OutputPin" />
           </Node>
-          <Pad Id="C1bvyJMknZjO1NR1DXn3LM" Bounds="54,77,179,37" ShowValueBox="true" isIOBox="true" Value="BezierCurve  ">
+          <Pad Id="C1bvyJMknZjO1NR1DXn3LM" Bounds="54,77,179,37" ShowValueBox="true" isIOBox="true" Value="NurbsCurve">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -387,6 +387,7 @@
                 <Pin Id="GxcrOCSiybtPVPBZ0cLXFI" Name="Factor" Kind="InputPin" />
                 <Pin Id="R1qijEIisozO1EmrOfCQKW" Name="Output" Kind="StateOutputPin" />
                 <Pin Id="PPPgR9Mifi7LSkSvmrtNOW" Name="Result" Kind="OutputPin" />
+                <Pin Id="JdxL4D0J5Z8L4bXvBbHvqZ" Name="Up Vector" Kind="InputPin" />
               </Node>
               <Node Bounds="1056,710,94,26" Id="NR7HC6RmvQEPthXBnrAJIq">
                 <p:NodeReference LastCategoryFullName="LNLib.Curve.NurbsCurve" LastDependency="VL.LNLib.vl">
@@ -405,7 +406,7 @@
             <ControlPoint Id="ElWTjGzgbRMOInkzxyy7NW" Bounds="968,670" Alignment="Top" />
             <ControlPoint Id="FUyJ6bS1WDiNqSHNwJwAvJ" Bounds="1147,771" Alignment="Bottom" />
           </Node>
-          <Pad Id="PxfxK2oaiTzNdJMt2eUZG4" Comment="" Bounds="1038,580,35,15" ShowValueBox="true" isIOBox="true" Value="0.52">
+          <Pad Id="PxfxK2oaiTzNdJMt2eUZG4" Comment="" Bounds="1038,580,35,15" ShowValueBox="true" isIOBox="true" Value="0.38">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="Float32" />
             </p:TypeAnnotation>

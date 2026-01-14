@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using LNLibSharp;
 using Stride.Core.Mathematics;
 
@@ -181,14 +182,38 @@ namespace VL.LNLib.Curve
             curve.degree = 0;
         }
 
-        public static T FromXYZ<T>(XYZ point)
+        internal static T FromXYZ<T>(XYZ point)
         {
-            // Note: Assuming XYZ fields are accessible as x, y, z (lowercase) based on previous context.
-            // If XYZ uses uppercase X, Y, Z, please adjust accordingly.
             if (typeof(T) == typeof(Vector2))
-                return (T)(object)new Vector2((float)point.x, (float)point.y);
+            {
+                Vector2 v = new Vector2((float)point.x, (float)point.y);
+                return Unsafe.As<Vector2, T>(ref v);
+            }
             if (typeof(T) == typeof(Vector3))
-                return (T)(object)new Vector3((float)point.x, (float)point.y, (float)point.z);
+            {
+                Vector3 v = new Vector3((float)point.x, (float)point.y, (float)point.z);
+                return Unsafe.As<Vector3, T>(ref v);
+            }
+
+            throw new NotSupportedException($"Type {typeof(T)} not supported.");
+        }
+
+        internal static T Normalize<T>(T vector)
+        {
+            if (typeof(T) == typeof(Vector3))
+            {
+                ref Vector3 vec = ref Unsafe.As<T, Vector3>(ref vector);
+                Vector3 result = Vector3.Normalize(vec);
+
+                return Unsafe.As<Vector3, T>(ref result);
+            }
+
+            if (typeof(T) == typeof(Vector2))
+            {
+                ref Vector2 vec = ref Unsafe.As<T, Vector2>(ref vector);
+                Vector2 result = Vector2.Normalize(vec);
+                return Unsafe.As<Vector2, T>(ref result);
+            }
 
             throw new NotSupportedException($"Type {typeof(T)} not supported.");
         }
