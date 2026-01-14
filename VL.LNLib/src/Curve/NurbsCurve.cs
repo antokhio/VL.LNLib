@@ -5,6 +5,7 @@ using Stride.Core.Mathematics;
 namespace VL.LNLib.Curve
 {
     public record struct NurbsCurve<T> : IDisposable
+        where T : struct
     {
         /// <summary>
         /// Holds the instance of the native LN_NurbsCurve struct.
@@ -136,11 +137,12 @@ namespace VL.LNLib.Curve
 
         /// <summary>
         /// Calculates the normal vector on the curve at parameter t.
+        /// For 3D curves, an up-vector is used to ensure stability.
         /// </summary>
         /// <param name="t">The parameter value.</param>
-        /// <param name="upVector">Optional up-vector for stability. Defaults to Y-Up.</param>
+        /// <param name="upVector">Optional up-vector for 3D stability. Defaults to Y-Up. Ignored for 2D.</param>
         /// <returns>The normal vector.</returns>
-        public T GetNormal(float t, T? upVector = default)
+        public T GetNormal(float t, T upVector = default)
         {
             ThrowIfNotAssigned();
 
@@ -150,22 +152,25 @@ namespace VL.LNLib.Curve
             if (typeof(T) == typeof(Vector3))
             {
                 var tangent = Unsafe.As<T, Vector3>(ref tangentT);
-                var up = upVector == null ? Vector3.UnitY : Unsafe.As<T, Vector3>(ref upVector);
+                var up = Unsafe.As<T, Vector3>(ref upVector);
+
+                // If user passed default (0,0,0), use UnitY
+                if (up == Vector3.Zero)
+                {
+                    up = Vector3.UnitY;
+                }
 
                 var binormal = Vector3.Cross(tangent, up);
 
                 // If Tangent is parallel to Up, pick a fallback
                 if (binormal.LengthSquared() < 1e-5f)
                 {
-                    // Fallback: try UnitX, if still parallel, try UnitZ
                     binormal = Vector3.Cross(tangent, Vector3.UnitX);
                     if (binormal.LengthSquared() < 1e-5f)
                         binormal = Vector3.Cross(tangent, Vector3.UnitZ);
                 }
 
                 binormal = Vector3.Normalize(binormal);
-
-                // Normal = Cross(Binormal, Tangent)
                 var normal = Vector3.Cross(binormal, tangent);
 
                 return Unsafe.As<Vector3, T>(ref normal);
@@ -173,9 +178,6 @@ namespace VL.LNLib.Curve
             else if (typeof(T) == typeof(Vector2))
             {
                 var tangent = Unsafe.As<T, Vector2>(ref tangentT);
-                if (tangent.LengthSquared() > 1e-6f)
-                    tangent = Vector2.Normalize(tangent);
-
                 // 2D Normal: (-y, x)
                 Vector2 normal = new Vector2(-tangent.Y, tangent.X);
                 return Unsafe.As<Vector2, T>(ref normal);
@@ -190,15 +192,11 @@ namespace VL.LNLib.Curve
         /// <param name="factor">The normalized length factor (0.0 to 1.0).</param>
         /// <param name="upVector">Optional up-vector for 3D stability.</param>
         /// <returns>The normal vector.</returns>
-        public T GetNormalAt(float factor, T upVector)
+        public T GetNormalAt(float factor, T upVector = default)
         {
             ThrowIfNotAssigned();
-            // Calculate target length from factor
             float targetLength = factor * Length;
-
-            // Get parameter t corresponding to that length
             var t = GetParamByLength(targetLength);
-
             return GetNormal(t, upVector);
         }
 
