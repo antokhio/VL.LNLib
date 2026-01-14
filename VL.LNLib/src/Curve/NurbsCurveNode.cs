@@ -1,125 +1,128 @@
 ﻿using Stride.Core.Mathematics;
 using VL.Core.Import;
-using VL.LNLib.Helpers;
+using VL.Model;
 
 namespace VL.LNLib.Curve
 {
     [ProcessNode]
-    public abstract class NurbsCurveNode<TCurve, TPoint>
-        where TCurve : NurbsCurve<TPoint>
+    public abstract class NurbsCurveNode<T> : IDisposable
     {
-        protected const int DefaultDegree = 1;
+        internal const int DefaultDegree = 2;
 
-        private TCurve _output;
-        public TCurve Output => _output;
-        public bool IsValid => _output.IsValid;
+        private NurbsCurve<T> _output;
+        protected bool _invalidated = false;
 
-        private IReadOnlyList<double>? _knots;
+        protected int _degree = DefaultDegree;
+        protected IReadOnlyList<T> _controlPoints;
+        protected IReadOnlyList<float> _knots;
 
-        public NurbsCurveNode(TCurve curve)
+        public NurbsCurve<T> Output => _output;
+
+        protected NurbsCurveNode(
+            int defaultDegree,
+            IReadOnlyList<T> defaultControlPoints,
+            IReadOnlyList<float> defaultKnots = null
+        )
         {
-            _output = curve;
+            _degree = defaultDegree;
+            _controlPoints = defaultControlPoints;
+            _knots = defaultKnots;
+
+            // Initialize immediately
+            Rebuild();
         }
 
         public void SetDegree(int degree = DefaultDegree)
         {
-            if (_output.Degree != degree)
+            if (_degree != degree)
             {
-                _output = _output with
-                {
-                    Degree = degree,
-                    Knots =
-                        _knots
-                        ?? KnotsHelper.GenerateClampedKnots(degree, _output.ControlPointCount),
-                };
+                _degree = degree;
+                _invalidated = true;
             }
         }
 
-        public void SetControlPoints(IReadOnlyList<TPoint> controlPoints)
+        public void SetControlPoints(IReadOnlyList<T> controlPoints)
         {
-            if (
-                !EqualityComparer<IReadOnlyList<TPoint>>.Default.Equals(
-                    _output.ControlPoints,
-                    controlPoints
-                )
-            )
+            if (_controlPoints != controlPoints)
             {
-                _output = _output with
-                {
-                    ControlPoints = controlPoints,
-                    Knots =
-                        _knots
-                        ?? KnotsHelper.GenerateClampedKnots(_output.Degree, controlPoints.Count),
-                };
+                _controlPoints = controlPoints;
+                _invalidated = true;
             }
         }
 
-        public void SetKnots(IReadOnlyList<double> knots)
+        public void SetKnots([Pin(Visibility = PinVisibility.Optional)] IReadOnlyList<float> knots)
         {
-            // Logic:
-            // 1. If 'knots' is null (pin disconnected), we switch '_knots' to null (Auto Mode).
-            // 2. We then update '_output.Knots' to be either the new custom knots OR the auto-generated ones.
-            if (!EqualityComparer<IReadOnlyList<double>>.Default.Equals(knots, _knots))
+            if (_knots != knots)
             {
                 _knots = knots;
-
-                var effectiveKnots =
-                    _knots
-                    ?? KnotsHelper.GenerateClampedKnots(
-                        _output.Degree,
-                        _output.ControlPoints.Count
-                    );
-
-                _output = _output with { Knots = effectiveKnots };
+                _invalidated = true;
             }
+        }
+
+        public void Update()
+        {
+            if (_invalidated)
+            {
+                Rebuild();
+                _invalidated = false;
+            }
+        }
+
+        private void Rebuild()
+        {
+            // Clean up previous native memory
+            _output.Dispose();
+
+            try
+            {
+                if (_knots != null)
+                {
+                    _output = new NurbsCurve<T>(_degree, _controlPoints, _knots);
+                }
+                else
+                {
+                    _output = new NurbsCurve<T>(_degree, _controlPoints);
+                }
+            }
+            catch
+            {
+                // Fallback or handle error (e.g. invalid arguments)
+                _output = default;
+                throw;
+            }
+        }
+
+        public void Dispose()
+        {
+            _output.Dispose();
         }
     }
 
     [ProcessNode(Name = "NurbsCurve (2D)")]
-    public class NurbsCurve2DNode : NurbsCurveNode<NurbsCurve2D, Vector2>
+    public class NurbsCurve2DNode : NurbsCurveNode<Vector2>
     {
-        protected static readonly IReadOnlyList<Vector2> DefaultControlPoints =
+        static readonly IReadOnlyList<Vector2> DefaultControlPoints =
         [
             new(-0.5f, 0f),
+            new(0f, 0f),
             new(0.5f, 0f),
         ];
 
-        protected static readonly IReadOnlyList<double> DefaultKnots =
-            KnotsHelper.GenerateClampedKnots(DefaultDegree, DefaultControlPoints.Count);
-
         public NurbsCurve2DNode()
-            : base(new(DefaultDegree, DefaultKnots, DefaultControlPoints)) { }
+            : base(DefaultDegree, DefaultControlPoints) { }
     }
 
     [ProcessNode(Name = "NurbsCurve (3D)")]
-    public class NurbsCurve3DNode : NurbsCurveNode<NurbsCurve3D, Vector3>
+    public class NurbsCurve3DNode : NurbsCurveNode<Vector3>
     {
-        protected static readonly IReadOnlyList<Vector3> DefaultControlPoints =
+        static readonly IReadOnlyList<Vector3> DefaultControlPoints =
         [
             new(-0.5f, 0f, 0f),
+            new(0f, 0f, 0f),
             new(0.5f, 0f, 0f),
         ];
 
-        protected static readonly IReadOnlyList<double> DefaultKnots =
-            KnotsHelper.GenerateClampedKnots(DefaultDegree, DefaultControlPoints.Count);
-
         public NurbsCurve3DNode()
-            : base(new(DefaultDegree, DefaultKnots, DefaultControlPoints)) { }
-    }
-
-    [ProcessNode(Name = "RationalNurbsCurve (3D)", Category = "LNLib.Curve")]
-    public class RationalNurbsCurve3DNode : NurbsCurveNode<RationalNurbsCurve3D, Vector4>
-    {
-        protected static readonly IReadOnlyList<Vector4> DefaultControlPoints =
-        [
-            new(-0.5f, 0f, 0f, 1f),
-            new(0.5f, 0f, 0f, 1f),
-        ];
-
-        protected static readonly IReadOnlyList<double> DefaultKnots =
-            KnotsHelper.GenerateClampedKnots(DefaultDegree, DefaultControlPoints.Count);
-
-        public RationalNurbsCurve3DNode()
-            : base(new(DefaultDegree, DefaultKnots, DefaultControlPoints)) { }
+            : base(DefaultDegree, DefaultControlPoints) { }
     }
 }
