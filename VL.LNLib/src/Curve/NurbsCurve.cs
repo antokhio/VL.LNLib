@@ -136,68 +136,111 @@ namespace VL.LNLib.Curve
         }
 
         /// <summary>
-        /// Calculates the normal vector on the curve at parameter t.
-        /// For 3D curves, an up-vector is used to ensure stability.
+        /// Calculates the normal vector on the 3D curve at parameter t.
+        /// Uses up-vector to ensure stability.
         /// </summary>
         /// <param name="t">The parameter value.</param>
-        /// <param name="upVector">Optional up-vector for 3D stability. Defaults to Y-Up. Ignored for 2D.</param>
+        /// <param name="upVector">Up vector. Defaults to Y-Up.</param>
         /// <returns>The normal vector.</returns>
-        public T GetNormal(float t, T upVector = default)
+        public Vector3 GetNormal(float t, Vector3 upVector = default)
         {
             ThrowIfNotAssigned();
+
+            if (typeof(T) != typeof(Vector3))
+                throw new InvalidOperationException(
+                    "GetNormal(float, Vector3) overload is only valid for Vector3 curves."
+                );
 
             // Get normalized tangent
             var tangentT = GetTangent(t);
 
-            if (typeof(T) == typeof(Vector3))
+            var tangent = Unsafe.As<T, Vector3>(ref tangentT);
+
+            // Fix: Check for default/Zero vector
+            var up = (upVector == Vector3.Zero) ? Vector3.UnitY : upVector;
+
+            var binormal = Vector3.Cross(tangent, up);
+
+            // If Tangent is parallel to Up, pick a fallback
+            if (binormal.LengthSquared() < 1e-5f)
             {
-                var tangent = Unsafe.As<T, Vector3>(ref tangentT);
-                var up = Unsafe.As<T, Vector3>(ref upVector);
-
-                // If user passed default (0,0,0), use UnitY
-                if (up == Vector3.Zero)
-                {
-                    up = Vector3.UnitY;
-                }
-
-                var binormal = Vector3.Cross(tangent, up);
-
-                // If Tangent is parallel to Up, pick a fallback
+                binormal = Vector3.Cross(tangent, Vector3.UnitX);
                 if (binormal.LengthSquared() < 1e-5f)
-                {
-                    binormal = Vector3.Cross(tangent, Vector3.UnitX);
-                    if (binormal.LengthSquared() < 1e-5f)
-                        binormal = Vector3.Cross(tangent, Vector3.UnitZ);
-                }
-
-                binormal = Vector3.Normalize(binormal);
-                var normal = Vector3.Cross(binormal, tangent);
-
-                return Unsafe.As<Vector3, T>(ref normal);
-            }
-            else if (typeof(T) == typeof(Vector2))
-            {
-                var tangent = Unsafe.As<T, Vector2>(ref tangentT);
-                // 2D Normal: (-y, x)
-                Vector2 normal = new Vector2(-tangent.Y, tangent.X);
-                return Unsafe.As<Vector2, T>(ref normal);
+                    binormal = Vector3.Cross(tangent, Vector3.UnitZ);
             }
 
-            throw new NotSupportedException($"Type {typeof(T)} not supported.");
+            binormal = Vector3.Normalize(binormal);
+            var normal = Vector3.Cross(binormal, tangent);
+
+            return normal;
         }
 
         /// <summary>
-        /// Calculates the normal vector on the curve at a normalized position along its length (0 to 1).
+        /// Calculates the normal vector on the 3D curve at a normalized position along its length (0 to 1).
         /// </summary>
         /// <param name="factor">The normalized length factor (0.0 to 1.0).</param>
-        /// <param name="upVector">Optional up-vector for 3D stability.</param>
+        /// <param name="upVector">Up vector. Defaults to Y-Up.</param>
         /// <returns>The normal vector.</returns>
-        public T GetNormalAt(float factor, T upVector = default)
+        public Vector3 GetNormalAt(float factor, Vector3 upVector = default)
         {
+            if (typeof(T) != typeof(Vector3))
+                throw new InvalidOperationException(
+                    "GetNormalAt(float, Vector3) overload is only valid for Vector3 curves."
+                );
+
             ThrowIfNotAssigned();
             float targetLength = factor * Length;
             var t = GetParamByLength(targetLength);
             return GetNormal(t, upVector);
+        }
+
+        /// <summary>
+        /// Calculates the normal vector on the 2D curve at parameter t.
+        /// </summary>
+        /// <param name="t">The parameter value.</param>
+        public Vector2 GetNormal(float t)
+        {
+            ThrowIfNotAssigned();
+
+            if (typeof(T) != typeof(Vector2))
+                throw new InvalidOperationException(
+                    "GetNormal(float) overload is only valid for Vector2 curves."
+                );
+
+            var tangentT = GetTangent(t);
+            var tangent = Unsafe.As<T, Vector2>(ref tangentT);
+            // 2D Normal: (-y, x)
+            Vector2 normal = new Vector2(-tangent.Y, tangent.X);
+
+            return normal;
+        }
+
+        /// <summary>
+        /// Calculates the normal vector on the 2D curve at a normalized position along its length (0 to 1).
+        /// </summary>
+        /// <param name="factor">The normalized length factor (0.0 to 1.0).</param>
+        /// <returns>The normal vector.</returns>
+        public Vector2 GetNormalAt(float factor)
+        {
+            ThrowIfNotAssigned();
+
+            if (typeof(T) != typeof(Vector2))
+            {
+                throw new InvalidOperationException(
+                    "GetNormalAt(float) overload is only valid for Vector2 curves."
+                );
+            }
+
+            // Fix: Map factor to parameter t before getting tangent
+            float targetLength = factor * Length;
+            var t = GetParamByLength(targetLength);
+
+            var tangentT = GetTangent(t);
+            var tangent = Unsafe.As<T, Vector2>(ref tangentT);
+            // 2D Normal: (-y, x)
+            Vector2 normal = new Vector2(-tangent.Y, tangent.X);
+
+            return normal;
         }
 
         /// <summary>

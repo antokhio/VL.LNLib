@@ -198,6 +198,43 @@ namespace VL.LNLib.Curve
             throw new NotSupportedException($"Type {typeof(T)} not supported.");
         }
 
+        internal static IReadOnlyList<T> FromXYZArray<T>(XYZ[] points)
+        {
+            if (points == null || points.Length == 0)
+                return Array.Empty<T>();
+
+            var result = new T[points.Length];
+            bool isVector2 = typeof(T) == typeof(Vector2);
+            bool isVector3 = typeof(T) == typeof(Vector3);
+
+            if (!isVector2 && !isVector3)
+                throw new NotSupportedException(
+                    $"Type {typeof(T)} not supported. Only Vector2 and Vector3."
+                );
+
+            for (int i = 0; i < points.Length; i++)
+            {
+                if (isVector2)
+                {
+                    // Map X, Y
+                    Vector2 v = new Vector2((float)points[i].x, (float)points[i].y);
+                    result[i] = Unsafe.As<Vector2, T>(ref v);
+                }
+                else
+                {
+                    // Map X, Y, Z
+                    Vector3 v = new Vector3(
+                        (float)points[i].x,
+                        (float)points[i].y,
+                        (float)points[i].z
+                    );
+                    result[i] = Unsafe.As<Vector3, T>(ref v);
+                }
+            }
+
+            return result;
+        }
+
         internal static T Normalize<T>(T vector)
         {
             if (typeof(T) == typeof(Vector3))

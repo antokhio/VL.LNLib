@@ -6,6 +6,7 @@ namespace VL.LNLib.Curve
 {
     [ProcessNode]
     public abstract class NurbsCurveNode<T> : IDisposable
+        where T : struct
     {
         internal const int DefaultDegree = 2;
 
