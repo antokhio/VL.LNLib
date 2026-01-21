@@ -2,3 +2,5 @@
 
 A NURBS / Bezier library for VL.
 Based on [LNLib](https://github.com/BIMCoderLiang/LNLib)
+
+Archiving this in favor https://github.com/antokhio/VL.Nurbsy
